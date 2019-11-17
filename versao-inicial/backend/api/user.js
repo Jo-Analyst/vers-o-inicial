@@ -22,7 +22,9 @@ module.exports = app => {
             const userFromDB = await app.db("users")
                 .where({ email: user.email }).first()
 
-            if (!user.id) notExistsOrError(userFromDB, "Usuário já cadastrado!")
+            if (!user.id) {
+                notExistsOrError(userFromDB, "Usuário já cadastrado!")
+            }
         }
         catch (msg) {
             return res.status(400).send(msg)
@@ -48,10 +50,20 @@ module.exports = app => {
 
     const get = (req, res) => {
         app.db("users")
-            .select("id", "name", "email", "admin")
+            .select("id", "name", "email", "admin")           
             .then(users => res.json(users))
             .catch(err => res.status(500).send(err))
     }
 
-    return { save, get };
+     const getById = (req, res) => {
+        app.db("users")
+            .select("id", "name", "email", "admin")
+            .where({id: req.params.id })
+            .first()
+            .then(user => res.json(user))
+            .catch(err => res.status(500).send(err))
+    }
+
+
+    return { save, get, getById };
 }
